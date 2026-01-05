@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Permissioned Blockchain for IIoT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:#020b18;
+  color:#e6f1ff;
+  overflow-x:hidden;
+}
+
+/* Background stars */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(2px 2px at 20% 30%,#4da6ff,transparent),
+    radial-gradient(2px 2px at 60% 70%,#4da6ff,transparent),
+    radial-gradient(2px 2px at 80% 40%,#4da6ff,transparent);
+  animation:stars 15s linear infinite;
+  opacity:.4;
+  z-index:-1;
+}
+@keyframes stars{to{transform:translateY(-300px)}}
+
+header{text-align:center;padding:50px 20px}
+header h1{
+  font-size:34px;
+  background:linear-gradient(90deg,#4da6ff,#9ad1ff);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+section{
+  max-width:1100px;
+  margin:50px auto;
+  padding:40px;
+  background:rgba(10,37,64,.85);
+  border-radius:20px;
+  box-shadow:0 0 35px rgba(77,166,255,.3);
+}
+h2{color:#9ad1ff}
+
+/* Architecture */
+.flow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.layer{
+  width:170px;padding:20px;text-align:center;
+  background:#071a33;border-radius:14px;
+  animation:pulse 2.5s infinite;
+}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.arrow{font-size:30px;color:#4da6ff}
+
+/* Blockchain */
+.miner{text-align:center}
+.pending{animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.4}}
+.hash{font-family:monospace;color:#7CFF7C;margin:10px}
+.chain{display:flex;gap:15px;justify-content:center;flex-wrap:wrap}
+
+.block{
+  width:150px;padding:15px;border-radius:10px;
+  background:#04162c;
+  box-shadow:0 0 20px rgba(77,166,255,.6);
+  animation:drop .7s ease;
+  cursor:pointer;
+}
+@keyframes drop{
+  from{transform:translateY(-30px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+
+/* Block tap pulse */
+.block:active {
+  animation: tapPulse 0.3s;
+}
+@keyframes tapPulse {
+  0% {transform:scale(1); background-color:#04162c;}
+  50% {transform:scale(1.1); background-color:#4da6ff;}
+  100% {transform:scale(1); background-color:#04162c;}
+}
+
+/* Glow effect for new block */
+.block.glow {
+  box-shadow: 0 0 25px #4da6ff, 0 0 40px #4da6ff;
+  transition: box-shadow 0.3s;
+}
+
+/* PBFT node animations */
+.node.approve {
+  background-color:#0a4;
+  animation: nodeBlink 0.6s ease-in-out 2;
+}
+.node.reject {
+  background-color:#a00;
+  animation: nodeBlink 0.6s ease-in-out 2;
+}
+@keyframes nodeBlink {
+  0%,100%{opacity:1;}
+  50%{opacity:0.4;}
+}
+
+button{
+  padding:12px 25px;border:none;border-radius:8px;
+  font-weight:bold;cursor:pointer;
+  background:linear-gradient(90deg,#4da6ff,#9ad1ff);
+}
+
+/* Login */
+.login{max-width:400px;margin:auto;text-align:center}
+.login input{
+  width:100%;padding:12px;margin:10px 0;
+  border-radius:8px;border:none;
+}
+#loading,#success,#error{display:none;margin-top:10px;color:#6CFF9A}
+#error{color:#FF6B6B}
+
+/* Dashboard */
+.dashboard{display:none}
+.stats{display:flex;justify-content:space-around;flex-wrap:wrap}
+.stat{font-size:20px;font-weight:bold}
+
+footer{text-align:center;padding:20px;color:#9ad1ff}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Permissioned Blockchain for IIoT</h1>
+<p>Multi-Layer Architecture</p>
+</header>
+
+<section>
+<h2>Multi-Layer Architecture</h2>
+<div class="flow">
+  <div class="layer">IIoT Devices</div>
+  <div class="arrow">➜</div>
+  <div class="layer">Edge Authentication</div>
+  <div class="arrow">➜</div>
+  <div class="layer">Permissioned Blockchain</div>
+  <div class="arrow">➜</div>
+  <div class="layer">Applications</div>
+</div>
+</section>
+
+<section>
+<h2>Blockchain Process Control</h2>
+<div class="miner">
+  <button id="startBtn" onclick="startProcess()" disabled>
+    Generate Secure Process
+  </button>
+  <div class="pending" id="status">🔒 Login required</div>
+  <div class="hash" id="hash">Hash: ----</div>
+</div>
+<div class="chain" id="chainBlocks"></div>
+<div class="nodes">
+  <div class="node" id="n1">Node 1</div>
+  <div class="node" id="n2">Node 2</div>
+  <div class="node" id="n3">Node 3</div>
+  <div class="node" id="n4">Node 4</div>
+</div>
+</section>
+
+<section>
+<h2>Permissioned Login</h2>
+<div class="login">
+  <input id="user" placeholder="Username (admin)">
+  <input id="pass" type="password" placeholder="Password (admin123)">
+  <button onclick="login()">Login</button>
+  <div id="loading">⏳ Authenticating...</div>
+  <div id="success">✔ Access Granted</div>
+  <div id="error">❌ Invalid Credentials</div>
+</div>
+</section>
+
+<section class="dashboard" id="dashboard">
+<h2>System Dashboard</h2>
+<div class="stats">
+  <div class="stat">🔗 Nodes: 5</div>
+  <div class="stat">📦 Blocks: <span id="bcount">0</span></div>
+  <div class="stat">📨 Transactions: <span id="txcount">0</span></div>
+</div>
+</section>
+
+<footer>© 2026 | Kuppanagari Ganesh</footer>
+
+<script>
+let blockNum=0;
+let interval=null;
+let loggedIn=false;
+
+/* Random Hash */
+function randomHash(){
+  return "0000"+Math.random().toString(16).substr(2,6);
+}
+
+/* LOGIN */
+function login(){
+  document.getElementById("error").style.display="none";
+  document.getElementById("loading").style.display="block";
+
+  setTimeout(()=>{
+    document.getElementById("loading").style.display="none";
+
+    if(user.value==="admin" && pass.value==="admin123"){
+      loggedIn=true;
+      document.getElementById("success").style.display="block";
+      document.getElementById("dashboard").style.display="block";
+      document.getElementById("startBtn").disabled=false;
+      document.getElementById("status").innerText="✔ Authenticated. Ready.";
+    }else{
+      document.getElementById("error").style.display="block";
+    }
+  },1500);
+}
+
+/* PBFT Node animation */
+function approveNode(nodeId, approve=true){
+  const node=document.getElementById(nodeId);
+  if(approve){
+    node.classList.add("approve");
+    node.innerText="✔ Approve";
+  }else{
+    node.classList.add("reject");
+    node.innerText="✖ Reject";
+  }
+  setTimeout(()=>node.classList.remove("approve","reject"),1200);
+}
+
+/* Mine Block with Glow */
+function mineBlock(){
+  const hash=randomHash();
+  document.getElementById("hash").innerText="Hash: "+hash;
+  document.getElementById("status").innerText="⏳ PBFT validating block...";
+
+  setTimeout(()=>{
+    blockNum++;
+    const b=document.createElement("div");
+    b.className="block glow";
+    b.innerHTML="<b>Block "+blockNum+"</b><br><small>"+hash+"</small>";
+    chainBlocks.appendChild(b);
+
+    bcount.innerText=blockNum;
+    txcount.innerText=blockNum*10;
+    document.getElementById("status").innerText="✔ Block approved by PBFT";
+
+    setTimeout(()=>b.classList.remove("glow"),600);
+  },1000);
+}
+
+/* Start Process */
+function startProcess(){
+  if(!loggedIn) return;
+
+  if(interval===null){
+    document.getElementById("status").innerText="▶ Secure IIoT process started";
+
+    // Simulate PBFT approval first
+    setTimeout(()=>approveNode("n1", true), 500);
+    setTimeout(()=>approveNode("n2", true), 1000);
+    setTimeout(()=>approveNode("n3", true), 1500);
+    setTimeout(()=>approveNode("n4", false), 2000);
+
+    setTimeout(()=>{
+      interval=setInterval(mineBlock, 3000);
+    }, 2500);
+  }
+}
+
+/* Block tap/click animation */
+chainBlocks.addEventListener("click", function(e){
+  if(e.target.classList.contains("block")){
+    e.target.style.backgroundColor="#4da6ff";
+    setTimeout(()=>e.target.style.backgroundColor="#04162c",300);
+  }
+});
+</script>
+
+</body>
+</html>
